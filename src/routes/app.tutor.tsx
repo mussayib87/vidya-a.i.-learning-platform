@@ -47,7 +47,7 @@ function TutorPage() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
   const [pending, setPending] = useState(false);
-  const [subjectId, setSubjectId] = useState(subjects[0].id);
+  const [subjectId, setSubjectId] = useState(subjects[0]?.id ?? "mathematics");
   const [languageId, setLanguageId] = useState("en");
   const [simple, setSimple] = useState(false);
   const inputRef = useRef<HTMLTextAreaElement>(null);
@@ -56,7 +56,7 @@ function TutorPage() {
   useEffect(() => {
     setMessages(chatService.list());
     if (profile.language) setLanguageId(profile.language);
-    if (profile.subjects.length) setSubjectId(profile.subjects[0]);
+    if (profile.subjects[0]) setSubjectId(profile.subjects[0]);
     inputRef.current?.focus();
   }, [profile.language, profile.subjects]);
 
