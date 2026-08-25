@@ -9,7 +9,7 @@ export function LessonCard({
   completed,
 }: {
   lesson: Lesson;
-  subjectName?: string;
+  subjectName?: string | undefined;
   completed: boolean;
 }) {
   return (
