@@ -10,13 +10,32 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AppDashboardRouteImport } from './routes/app.dashboard'
+import { Route as AppProfileRouteImport } from './routes/app.profile'
+import { Route as AppProgressRouteImport } from './routes/app.progress'
 import { Route as AppTutorRouteImport } from './routes/app.tutor'
 import { Route as AppLessonsLessonIdRouteImport } from './routes/app.lessons.$lessonId'
+import { Route as AppSubjectsIndexRouteImport } from './routes/app.subjects.index'
 import { Route as AppSubjectsSubjectIdRouteImport } from './routes/app.subjects.$subjectId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AppDashboardRoute = AppDashboardRouteImport.update({
+  id: '/app/dashboard',
+  path: '/app/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AppProfileRoute = AppProfileRouteImport.update({
+  id: '/app/profile',
+  path: '/app/profile',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AppProgressRoute = AppProgressRouteImport.update({
+  id: '/app/progress',
+  path: '/app/progress',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AppTutorRoute = AppTutorRouteImport.update({
@@ -29,6 +48,11 @@ const AppLessonsLessonIdRoute = AppLessonsLessonIdRouteImport.update({
   path: '/app/lessons/$lessonId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AppSubjectsIndexRoute = AppSubjectsIndexRouteImport.update({
+  id: '/app/subjects/',
+  path: '/app/subjects/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AppSubjectsSubjectIdRoute = AppSubjectsSubjectIdRouteImport.update({
   id: '/app/subjects/$subjectId',
   path: '/app/subjects/$subjectId',
@@ -37,42 +61,77 @@ const AppSubjectsSubjectIdRoute = AppSubjectsSubjectIdRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/app/dashboard': typeof AppDashboardRoute
+  '/app/profile': typeof AppProfileRoute
+  '/app/progress': typeof AppProgressRoute
   '/app/tutor': typeof AppTutorRoute
   '/app/lessons/$lessonId': typeof AppLessonsLessonIdRoute
   '/app/subjects/$subjectId': typeof AppSubjectsSubjectIdRoute
+  '/app/subjects/': typeof AppSubjectsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/app/dashboard': typeof AppDashboardRoute
+  '/app/profile': typeof AppProfileRoute
+  '/app/progress': typeof AppProgressRoute
   '/app/tutor': typeof AppTutorRoute
   '/app/lessons/$lessonId': typeof AppLessonsLessonIdRoute
   '/app/subjects/$subjectId': typeof AppSubjectsSubjectIdRoute
+  '/app/subjects': typeof AppSubjectsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/app/dashboard': typeof AppDashboardRoute
+  '/app/profile': typeof AppProfileRoute
+  '/app/progress': typeof AppProgressRoute
   '/app/tutor': typeof AppTutorRoute
   '/app/lessons/$lessonId': typeof AppLessonsLessonIdRoute
   '/app/subjects/$subjectId': typeof AppSubjectsSubjectIdRoute
+  '/app/subjects/': typeof AppSubjectsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    '/' | '/app/tutor' | '/app/lessons/$lessonId' | '/app/subjects/$subjectId'
-  fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/app/tutor' | '/app/lessons/$lessonId' | '/app/subjects/$subjectId'
-  id:
-    | '__root__'
     | '/'
+    | '/app/dashboard'
+    | '/app/profile'
+    | '/app/progress'
     | '/app/tutor'
     | '/app/lessons/$lessonId'
     | '/app/subjects/$subjectId'
+    | '/app/subjects/'
+  fileRoutesByTo: FileRoutesByTo
+  to:
+    | '/'
+    | '/app/dashboard'
+    | '/app/profile'
+    | '/app/progress'
+    | '/app/tutor'
+    | '/app/lessons/$lessonId'
+    | '/app/subjects/$subjectId'
+    | '/app/subjects'
+  id:
+    | '__root__'
+    | '/'
+    | '/app/dashboard'
+    | '/app/profile'
+    | '/app/progress'
+    | '/app/tutor'
+    | '/app/lessons/$lessonId'
+    | '/app/subjects/$subjectId'
+    | '/app/subjects/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AppDashboardRoute: typeof AppDashboardRoute
+  AppProfileRoute: typeof AppProfileRoute
+  AppProgressRoute: typeof AppProgressRoute
   AppTutorRoute: typeof AppTutorRoute
   AppLessonsLessonIdRoute: typeof AppLessonsLessonIdRoute
   AppSubjectsSubjectIdRoute: typeof AppSubjectsSubjectIdRoute
+  AppSubjectsIndexRoute: typeof AppSubjectsIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -82,6 +141,27 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/app/dashboard': {
+      id: '/app/dashboard'
+      path: '/app/dashboard'
+      fullPath: '/app/dashboard'
+      preLoaderRoute: typeof AppDashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/app/profile': {
+      id: '/app/profile'
+      path: '/app/profile'
+      fullPath: '/app/profile'
+      preLoaderRoute: typeof AppProfileRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/app/progress': {
+      id: '/app/progress'
+      path: '/app/progress'
+      fullPath: '/app/progress'
+      preLoaderRoute: typeof AppProgressRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/app/tutor': {
@@ -98,6 +178,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppLessonsLessonIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/app/subjects/': {
+      id: '/app/subjects/'
+      path: '/app/subjects'
+      fullPath: '/app/subjects/'
+      preLoaderRoute: typeof AppSubjectsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/app/subjects/$subjectId': {
       id: '/app/subjects/$subjectId'
       path: '/app/subjects/$subjectId'
@@ -110,9 +197,13 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AppDashboardRoute: AppDashboardRoute,
+  AppProfileRoute: AppProfileRoute,
+  AppProgressRoute: AppProgressRoute,
   AppTutorRoute: AppTutorRoute,
   AppLessonsLessonIdRoute: AppLessonsLessonIdRoute,
   AppSubjectsSubjectIdRoute: AppSubjectsSubjectIdRoute,
+  AppSubjectsIndexRoute: AppSubjectsIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
