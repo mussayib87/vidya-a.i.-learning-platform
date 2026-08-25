@@ -10,10 +10,21 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as OnboardingRouteImport } from './routes/onboarding'
+import { Route as SignupRouteImport } from './routes/signup'
 import { Route as AppDashboardRouteImport } from './routes/app.dashboard'
 import { Route as AppProfileRouteImport } from './routes/app.profile'
 import { Route as AppProgressRouteImport } from './routes/app.progress'
 import { Route as AppTutorRouteImport } from './routes/app.tutor'
+import { Route as OnboardingClassRouteImport } from './routes/onboarding/class'
+import { Route as OnboardingCompleteRouteImport } from './routes/onboarding/complete'
+import { Route as OnboardingLanguageRouteImport } from './routes/onboarding/language'
+import { Route as OnboardingPreferencesRouteImport } from './routes/onboarding/preferences'
+import { Route as OnboardingReviewRouteImport } from './routes/onboarding/review'
+import { Route as OnboardingSubjectsRouteImport } from './routes/onboarding/subjects'
+import { Route as OnboardingWelcomeRouteImport } from './routes/onboarding/welcome'
 import { Route as AppLessonsLessonIdRouteImport } from './routes/app.lessons.$lessonId'
 import { Route as AppSubjectsIndexRouteImport } from './routes/app.subjects.index'
 import { Route as AppSubjectsSubjectIdRouteImport } from './routes/app.subjects.$subjectId'
@@ -21,6 +32,26 @@ import { Route as AppSubjectsSubjectIdRouteImport } from './routes/app.subjects.
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
+  id: '/forgot-password',
+  path: '/forgot-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OnboardingRoute = OnboardingRouteImport.update({
+  id: '/onboarding',
+  path: '/onboarding',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SignupRoute = SignupRouteImport.update({
+  id: '/signup',
+  path: '/signup',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AppDashboardRoute = AppDashboardRouteImport.update({
@@ -43,6 +74,41 @@ const AppTutorRoute = AppTutorRouteImport.update({
   path: '/app/tutor',
   getParentRoute: () => rootRouteImport,
 } as any)
+const OnboardingClassRoute = OnboardingClassRouteImport.update({
+  id: '/class',
+  path: '/class',
+  getParentRoute: () => OnboardingRoute,
+} as any)
+const OnboardingCompleteRoute = OnboardingCompleteRouteImport.update({
+  id: '/complete',
+  path: '/complete',
+  getParentRoute: () => OnboardingRoute,
+} as any)
+const OnboardingLanguageRoute = OnboardingLanguageRouteImport.update({
+  id: '/language',
+  path: '/language',
+  getParentRoute: () => OnboardingRoute,
+} as any)
+const OnboardingPreferencesRoute = OnboardingPreferencesRouteImport.update({
+  id: '/preferences',
+  path: '/preferences',
+  getParentRoute: () => OnboardingRoute,
+} as any)
+const OnboardingReviewRoute = OnboardingReviewRouteImport.update({
+  id: '/review',
+  path: '/review',
+  getParentRoute: () => OnboardingRoute,
+} as any)
+const OnboardingSubjectsRoute = OnboardingSubjectsRouteImport.update({
+  id: '/subjects',
+  path: '/subjects',
+  getParentRoute: () => OnboardingRoute,
+} as any)
+const OnboardingWelcomeRoute = OnboardingWelcomeRouteImport.update({
+  id: '/welcome',
+  path: '/welcome',
+  getParentRoute: () => OnboardingRoute,
+} as any)
 const AppLessonsLessonIdRoute = AppLessonsLessonIdRouteImport.update({
   id: '/app/lessons/$lessonId',
   path: '/app/lessons/$lessonId',
@@ -61,20 +127,42 @@ const AppSubjectsSubjectIdRoute = AppSubjectsSubjectIdRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/forgot-password': typeof ForgotPasswordRoute
+  '/login': typeof LoginRoute
+  '/onboarding': typeof OnboardingRouteWithChildren
+  '/signup': typeof SignupRoute
   '/app/dashboard': typeof AppDashboardRoute
   '/app/profile': typeof AppProfileRoute
   '/app/progress': typeof AppProgressRoute
   '/app/tutor': typeof AppTutorRoute
+  '/onboarding/class': typeof OnboardingClassRoute
+  '/onboarding/complete': typeof OnboardingCompleteRoute
+  '/onboarding/language': typeof OnboardingLanguageRoute
+  '/onboarding/preferences': typeof OnboardingPreferencesRoute
+  '/onboarding/review': typeof OnboardingReviewRoute
+  '/onboarding/subjects': typeof OnboardingSubjectsRoute
+  '/onboarding/welcome': typeof OnboardingWelcomeRoute
   '/app/lessons/$lessonId': typeof AppLessonsLessonIdRoute
   '/app/subjects/$subjectId': typeof AppSubjectsSubjectIdRoute
   '/app/subjects/': typeof AppSubjectsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/forgot-password': typeof ForgotPasswordRoute
+  '/login': typeof LoginRoute
+  '/onboarding': typeof OnboardingRouteWithChildren
+  '/signup': typeof SignupRoute
   '/app/dashboard': typeof AppDashboardRoute
   '/app/profile': typeof AppProfileRoute
   '/app/progress': typeof AppProgressRoute
   '/app/tutor': typeof AppTutorRoute
+  '/onboarding/class': typeof OnboardingClassRoute
+  '/onboarding/complete': typeof OnboardingCompleteRoute
+  '/onboarding/language': typeof OnboardingLanguageRoute
+  '/onboarding/preferences': typeof OnboardingPreferencesRoute
+  '/onboarding/review': typeof OnboardingReviewRoute
+  '/onboarding/subjects': typeof OnboardingSubjectsRoute
+  '/onboarding/welcome': typeof OnboardingWelcomeRoute
   '/app/lessons/$lessonId': typeof AppLessonsLessonIdRoute
   '/app/subjects/$subjectId': typeof AppSubjectsSubjectIdRoute
   '/app/subjects': typeof AppSubjectsIndexRoute
@@ -82,10 +170,21 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/forgot-password': typeof ForgotPasswordRoute
+  '/login': typeof LoginRoute
+  '/onboarding': typeof OnboardingRouteWithChildren
+  '/signup': typeof SignupRoute
   '/app/dashboard': typeof AppDashboardRoute
   '/app/profile': typeof AppProfileRoute
   '/app/progress': typeof AppProgressRoute
   '/app/tutor': typeof AppTutorRoute
+  '/onboarding/class': typeof OnboardingClassRoute
+  '/onboarding/complete': typeof OnboardingCompleteRoute
+  '/onboarding/language': typeof OnboardingLanguageRoute
+  '/onboarding/preferences': typeof OnboardingPreferencesRoute
+  '/onboarding/review': typeof OnboardingReviewRoute
+  '/onboarding/subjects': typeof OnboardingSubjectsRoute
+  '/onboarding/welcome': typeof OnboardingWelcomeRoute
   '/app/lessons/$lessonId': typeof AppLessonsLessonIdRoute
   '/app/subjects/$subjectId': typeof AppSubjectsSubjectIdRoute
   '/app/subjects/': typeof AppSubjectsIndexRoute
@@ -94,30 +193,63 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/forgot-password'
+    | '/login'
+    | '/onboarding'
+    | '/signup'
     | '/app/dashboard'
     | '/app/profile'
     | '/app/progress'
     | '/app/tutor'
+    | '/onboarding/class'
+    | '/onboarding/complete'
+    | '/onboarding/language'
+    | '/onboarding/preferences'
+    | '/onboarding/review'
+    | '/onboarding/subjects'
+    | '/onboarding/welcome'
     | '/app/lessons/$lessonId'
     | '/app/subjects/$subjectId'
     | '/app/subjects/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/forgot-password'
+    | '/login'
+    | '/onboarding'
+    | '/signup'
     | '/app/dashboard'
     | '/app/profile'
     | '/app/progress'
     | '/app/tutor'
+    | '/onboarding/class'
+    | '/onboarding/complete'
+    | '/onboarding/language'
+    | '/onboarding/preferences'
+    | '/onboarding/review'
+    | '/onboarding/subjects'
+    | '/onboarding/welcome'
     | '/app/lessons/$lessonId'
     | '/app/subjects/$subjectId'
     | '/app/subjects'
   id:
     | '__root__'
     | '/'
+    | '/forgot-password'
+    | '/login'
+    | '/onboarding'
+    | '/signup'
     | '/app/dashboard'
     | '/app/profile'
     | '/app/progress'
     | '/app/tutor'
+    | '/onboarding/class'
+    | '/onboarding/complete'
+    | '/onboarding/language'
+    | '/onboarding/preferences'
+    | '/onboarding/review'
+    | '/onboarding/subjects'
+    | '/onboarding/welcome'
     | '/app/lessons/$lessonId'
     | '/app/subjects/$subjectId'
     | '/app/subjects/'
@@ -125,6 +257,10 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ForgotPasswordRoute: typeof ForgotPasswordRoute
+  LoginRoute: typeof LoginRoute
+  OnboardingRoute: typeof OnboardingRouteWithChildren
+  SignupRoute: typeof SignupRoute
   AppDashboardRoute: typeof AppDashboardRoute
   AppProfileRoute: typeof AppProfileRoute
   AppProgressRoute: typeof AppProgressRoute
@@ -141,6 +277,34 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/forgot-password': {
+      id: '/forgot-password'
+      path: '/forgot-password'
+      fullPath: '/forgot-password'
+      preLoaderRoute: typeof ForgotPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/onboarding': {
+      id: '/onboarding'
+      path: '/onboarding'
+      fullPath: '/onboarding'
+      preLoaderRoute: typeof OnboardingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/signup': {
+      id: '/signup'
+      path: '/signup'
+      fullPath: '/signup'
+      preLoaderRoute: typeof SignupRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/app/dashboard': {
@@ -171,6 +335,55 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppTutorRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/onboarding/class': {
+      id: '/onboarding/class'
+      path: '/class'
+      fullPath: '/onboarding/class'
+      preLoaderRoute: typeof OnboardingClassRouteImport
+      parentRoute: typeof OnboardingRoute
+    }
+    '/onboarding/complete': {
+      id: '/onboarding/complete'
+      path: '/complete'
+      fullPath: '/onboarding/complete'
+      preLoaderRoute: typeof OnboardingCompleteRouteImport
+      parentRoute: typeof OnboardingRoute
+    }
+    '/onboarding/language': {
+      id: '/onboarding/language'
+      path: '/language'
+      fullPath: '/onboarding/language'
+      preLoaderRoute: typeof OnboardingLanguageRouteImport
+      parentRoute: typeof OnboardingRoute
+    }
+    '/onboarding/preferences': {
+      id: '/onboarding/preferences'
+      path: '/preferences'
+      fullPath: '/onboarding/preferences'
+      preLoaderRoute: typeof OnboardingPreferencesRouteImport
+      parentRoute: typeof OnboardingRoute
+    }
+    '/onboarding/review': {
+      id: '/onboarding/review'
+      path: '/review'
+      fullPath: '/onboarding/review'
+      preLoaderRoute: typeof OnboardingReviewRouteImport
+      parentRoute: typeof OnboardingRoute
+    }
+    '/onboarding/subjects': {
+      id: '/onboarding/subjects'
+      path: '/subjects'
+      fullPath: '/onboarding/subjects'
+      preLoaderRoute: typeof OnboardingSubjectsRouteImport
+      parentRoute: typeof OnboardingRoute
+    }
+    '/onboarding/welcome': {
+      id: '/onboarding/welcome'
+      path: '/welcome'
+      fullPath: '/onboarding/welcome'
+      preLoaderRoute: typeof OnboardingWelcomeRouteImport
+      parentRoute: typeof OnboardingRoute
+    }
     '/app/lessons/$lessonId': {
       id: '/app/lessons/$lessonId'
       path: '/app/lessons/$lessonId'
@@ -195,8 +408,36 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface OnboardingRouteChildren {
+  OnboardingClassRoute: typeof OnboardingClassRoute
+  OnboardingCompleteRoute: typeof OnboardingCompleteRoute
+  OnboardingLanguageRoute: typeof OnboardingLanguageRoute
+  OnboardingPreferencesRoute: typeof OnboardingPreferencesRoute
+  OnboardingReviewRoute: typeof OnboardingReviewRoute
+  OnboardingSubjectsRoute: typeof OnboardingSubjectsRoute
+  OnboardingWelcomeRoute: typeof OnboardingWelcomeRoute
+}
+
+const OnboardingRouteChildren: OnboardingRouteChildren = {
+  OnboardingClassRoute: OnboardingClassRoute,
+  OnboardingCompleteRoute: OnboardingCompleteRoute,
+  OnboardingLanguageRoute: OnboardingLanguageRoute,
+  OnboardingPreferencesRoute: OnboardingPreferencesRoute,
+  OnboardingReviewRoute: OnboardingReviewRoute,
+  OnboardingSubjectsRoute: OnboardingSubjectsRoute,
+  OnboardingWelcomeRoute: OnboardingWelcomeRoute,
+}
+
+const OnboardingRouteWithChildren = OnboardingRoute._addFileChildren(
+  OnboardingRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ForgotPasswordRoute: ForgotPasswordRoute,
+  LoginRoute: LoginRoute,
+  OnboardingRoute: OnboardingRouteWithChildren,
+  SignupRoute: SignupRoute,
   AppDashboardRoute: AppDashboardRoute,
   AppProfileRoute: AppProfileRoute,
   AppProgressRoute: AppProgressRoute,
