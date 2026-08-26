@@ -85,8 +85,9 @@ function DashboardPage() {
           <ProgressBar className="mt-3" value={goalPercent} />
         </section>
 
-        <div className="mt-6 grid gap-6 lg:grid-cols-3">
-          <section className="lg:col-span-2">
+        <div className="mt-6 grid grid-cols-[minmax(0,1fr)] gap-6 lg:grid-cols-3">
+          <section className="min-w-0 lg:col-span-2">
+
             <h2 className="font-semibold">Recommended lessons</h2>
             <div className="mt-3 space-y-3">
               {recommended.map((lesson) => (
