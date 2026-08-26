@@ -1,4 +1,4 @@
-import { Outlet, createFileRoute } from "@tanstack/react-router";
+import { Outlet, createFileRoute, useRouterState } from "@tanstack/react-router";
 import { GraduationCap } from "lucide-react";
 
 export const Route = createFileRoute("/onboarding")({
@@ -16,8 +16,8 @@ const steps = [
 ];
 
 function OnboardingLayout() {
-  const router = Route.useRouter();
-  const currentIndex = steps.findIndex((s) => s.path === router.state.location.pathname);
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const currentIndex = steps.findIndex((s) => s.path === pathname);
   const activeIndex = currentIndex === -1 ? 0 : currentIndex;
   const progress = Math.round(((activeIndex + 1) / steps.length) * 100);
 
