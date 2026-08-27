@@ -14,7 +14,74 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      live_classes: {
+        Row: {
+          code: string
+          created_at: string
+          grade: string
+          id: string
+          is_live: boolean
+          name: string
+          subject: string
+          teacher_lang: string
+          teacher_name: string | null
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          grade: string
+          id?: string
+          is_live?: boolean
+          name: string
+          subject: string
+          teacher_lang?: string
+          teacher_name?: string | null
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          grade?: string
+          id?: string
+          is_live?: boolean
+          name?: string
+          subject?: string
+          teacher_lang?: string
+          teacher_name?: string | null
+        }
+        Relationships: []
+      }
+      live_messages: {
+        Row: {
+          class_id: string
+          created_at: string
+          id: string
+          source_lang: string
+          source_text: string
+        }
+        Insert: {
+          class_id: string
+          created_at?: string
+          id?: string
+          source_lang: string
+          source_text: string
+        }
+        Update: {
+          class_id?: string
+          created_at?: string
+          id?: string
+          source_lang?: string
+          source_text?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "live_messages_class_id_fkey"
+            columns: ["class_id"]
+            isOneToOne: false
+            referencedRelation: "live_classes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
