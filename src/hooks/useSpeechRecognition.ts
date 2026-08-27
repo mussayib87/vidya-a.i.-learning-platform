@@ -42,6 +42,7 @@ export function useSpeechRecognition(options: {
 
   const recognitionRef = useRef<SpeechRecognitionLike | null>(null);
   const wantListeningRef = useRef(false);
+  const lastFinalRef = useRef("");
   const onFinalRef = useRef(onFinal);
   onFinalRef.current = onFinal;
   const langRef = useRef(lang);
@@ -65,7 +66,14 @@ export function useSpeechRecognition(options: {
         const result = event.results[i]!;
         const text = result[0].transcript.trim();
         if (!text) continue;
-        if (result.isFinal) onFinalRef.current(text);
+        if (result.isFinal) {
+          // Browsers can repeat the last final result when a recognition session
+          // restarts after a pause. Keep intentional repeats after new speech.
+          if (text !== lastFinalRef.current) {
+            lastFinalRef.current = text;
+            onFinalRef.current(text);
+          }
+        }
         else pending += ` ${text}`;
       }
       setInterim(pending.trim());
@@ -123,6 +131,7 @@ export function useSpeechRecognition(options: {
     const recognition = buildRecognition();
     if (!recognition) return;
     recognitionRef.current = recognition;
+    lastFinalRef.current = "";
     wantListeningRef.current = true;
     try {
       recognition.start();

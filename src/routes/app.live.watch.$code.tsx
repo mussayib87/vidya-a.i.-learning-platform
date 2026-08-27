@@ -1,13 +1,15 @@
 import { useEffect, useRef, useState } from "react";
-import { createFileRoute, notFound } from "@tanstack/react-router";
-import { AlertCircle, Headphones, Radio, Volume2 } from "lucide-react";
+import { createFileRoute, notFound, useNavigate } from "@tanstack/react-router";
+import { AlertCircle, Camera, Headphones, LogOut, MicOff, Radio, Volume2 } from "lucide-react";
 import { z } from "zod";
+import { toast } from "sonner";
 
 import { AppShell } from "@/components/layout/AppShell";
 import { liveLanguages } from "@/data/live-languages";
 import { supabase } from "@/integrations/supabase/client";
 import { translateText } from "@/lib/translate.functions";
 import { liveService, type LiveMessage } from "@/lib/live.service";
+import { useLiveWebRTC } from "@/hooks/useLiveWebRTC";
 
 const searchSchema = z.object({ lang: z.string().optional() });
 
@@ -26,13 +28,24 @@ type DisplayMessage = LiveMessage & { translated?: string; translating?: boolean
 function WatchClassPage() {
   const { liveClass } = Route.useLoaderData();
   const { lang } = Route.useSearch();
+  const navigate = useNavigate();
   const [messages, setMessages] = useState<DisplayMessage[]>([]);
   const [status, setStatus] = useState("Connecting to the classroom...");
   const [error, setError] = useState<string | null>(null);
   const seenRef = useRef(new Set<string>());
   const translatingRef = useRef(new Set<string>());
+  const translationCacheRef = useRef(new Map<string, string>());
+  const translationRequestsRef = useRef(new Map<string, Promise<string>>());
   const spokenRef = useRef(new Set<string>());
   const selected = liveLanguages.find((item) => item.id === lang);
+  const media = useLiveWebRTC({ classId: liveClass.id, role: "student" });
+
+  useEffect(() => {
+    if (media.classEnded) {
+      toast.info("Class has ended.");
+      void navigate({ to: "/app/live/join" });
+    }
+  }, [media.classEnded, navigate]);
 
   useEffect(() => {
     if (!selected) {
@@ -46,8 +59,26 @@ function WatchClassPage() {
       setMessages((current) => [...current, { ...message, translating: true }]);
       if (translatingRef.current.has(message.id)) return;
       translatingRef.current.add(message.id);
-      void translateText({ data: { text: message.source_text, from: message.source_lang, to: selected.id } })
-        .then(({ text }) => {
+      const cacheKey = `${message.source_lang}:${selected.id}:${message.source_text.trim()}`;
+      const cachedText = translationCacheRef.current.get(cacheKey);
+      const requestStartedAt = performance.now();
+      const translationRequest = cachedText
+        ? Promise.resolve(cachedText)
+        : translationRequestsRef.current.get(cacheKey) ?? translateText({ data: { text: message.source_text, from: message.source_lang, to: selected.id } }).then(({ text }) => text);
+      if (!cachedText && !translationRequestsRef.current.has(cacheKey)) {
+        translationRequestsRef.current.set(cacheKey, translationRequest);
+      }
+      void translationRequest
+        .then((text) => {
+          translationCacheRef.current.set(cacheKey, text);
+          translationRequestsRef.current.delete(cacheKey);
+          if (import.meta.env.DEV) {
+            console.debug("[live-translation] student translation rendered", {
+              at: performance.now(),
+              requestMs: Math.round(performance.now() - requestStartedAt),
+              cached: Boolean(cachedText),
+            });
+          }
           if (!active) return;
           setMessages((current) => current.map((item) => item.id === message.id ? { ...item, translated: text, translating: false } : item));
           if (shouldSpeak && !spokenRef.current.has(message.id) && "speechSynthesis" in window) {
@@ -58,6 +89,7 @@ function WatchClassPage() {
           }
         })
         .catch((translationError) => {
+          translationRequestsRef.current.delete(cacheKey);
           if (!active) return;
           setMessages((current) => current.map((item) => item.id === message.id ? { ...item, translating: false, error: translationError instanceof Error ? translationError.message : "Translation failed." } : item));
         });
@@ -81,7 +113,7 @@ function WatchClassPage() {
       <main className="px-4 py-8 sm:px-6 lg:px-8"><div className="mx-auto w-full max-w-3xl">
         <div className="flex items-start justify-between gap-4"><div><p className="text-sm text-muted-foreground">Live classroom · {liveClass.code}</p><h1 className="mt-1 text-2xl font-bold tracking-tight">{liveClass.name}</h1><p className="mt-1 text-sm text-muted-foreground">{liveClass.subject} · Hearing in {selected?.label ?? "unknown language"}</p></div><span className="flex shrink-0 items-center gap-2 rounded-full bg-primary-soft px-3 py-1.5 text-xs font-semibold text-primary"><Radio className="size-3.5" /> {status}</span></div>
         {error && <div className="mt-6 flex gap-2 rounded-xl border border-destructive/30 bg-destructive/5 p-4 text-sm text-destructive"><AlertCircle className="size-4 shrink-0" /> {error}</div>}
-        <section className="mt-8 rounded-2xl border border-border bg-card p-5 shadow-card"><div className="flex items-center gap-3"><span className="grid size-11 place-items-center rounded-2xl bg-accent/10 text-accent"><Headphones className="size-5" /></span><div><h2 className="font-semibold">Teacher transcript</h2><p className="text-sm text-muted-foreground">Translations are read aloud as they arrive.</p></div></div><div className="mt-5 space-y-4">{messages.length === 0 ? <p className="text-sm text-muted-foreground">Waiting for the teacher to speak...</p> : messages.map((message) => <article key={message.id} className="border-t border-border pt-4 first:border-t-0 first:pt-0"><p className="text-sm text-muted-foreground">{message.source_text}</p><p className="mt-1 flex items-start gap-2 text-base font-medium">{message.translated ?? (message.translating ? "Translating..." : message.error)}{message.translated && <Volume2 className="mt-0.5 size-4 shrink-0 text-primary" />}</p></article>)}</div></section>
+        <section className="mt-8 rounded-2xl border border-border bg-card p-5 shadow-card"><div className="overflow-hidden rounded-xl bg-slate-950"><video ref={media.remoteVideoRef} autoPlay playsInline className="aspect-video w-full object-cover" /></div><div className="mt-3 flex items-center justify-between text-sm"><span className="flex items-center gap-2 text-muted-foreground"><Headphones className="size-4" /> Teacher audio</span><span className="font-medium text-primary">{media.status === "connected" ? "Connected" : media.status === "reconnecting" ? "Reconnecting..." : "Connecting..."}</span></div><div className="mt-5 flex items-center gap-3"><span className="grid size-10 place-items-center rounded-xl bg-muted text-muted-foreground"><MicOff className="size-4" /></span><p className="text-sm text-muted-foreground">Student microphone is muted</p></div><div className="mt-5 flex items-center gap-3"><span className="grid size-10 place-items-center rounded-xl bg-muted text-muted-foreground"><Camera className="size-4" /></span><p className="text-sm text-muted-foreground">Teacher camera and audio are live</p></div><div className="mt-5 flex items-center gap-3"><span className="grid size-11 place-items-center rounded-2xl bg-accent/10 text-accent"><Headphones className="size-5" /></span><div><h2 className="font-semibold">Teacher transcript</h2><p className="text-sm text-muted-foreground">Translations are read aloud as they arrive.</p></div></div><div className="mt-5 space-y-4">{messages.length === 0 ? <p className="text-sm text-muted-foreground">Waiting for the teacher to speak...</p> : messages.map((message) => <article key={message.id} className="border-t border-border pt-4 first:border-t-0 first:pt-0"><p className="text-sm text-muted-foreground">{message.source_text}</p><p className="mt-1 flex items-start gap-2 text-base font-medium">{message.translated ?? (message.translating ? "Translating..." : message.error)}{message.translated && <Volume2 className="mt-0.5 size-4 shrink-0 text-primary" />}</p></article>)}</div><Button variant="outline" className="mt-6 rounded-xl" onClick={() => void navigate({ to: "/app/live/join" })}><LogOut className="size-4" /> Leave class</Button></section>
       </div></main>
     </AppShell>
   );

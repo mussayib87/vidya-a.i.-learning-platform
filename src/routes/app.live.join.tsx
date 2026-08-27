@@ -57,6 +57,10 @@ function JoinClassPage() {
         toast.error("No class found with that code.");
         return;
       }
+      if (!cls.is_live) {
+        toast.error("This class has not started or has already ended.");
+        return;
+      }
       navigate({
         to: "/app/live/watch/$code",
         params: { code: cls.code },

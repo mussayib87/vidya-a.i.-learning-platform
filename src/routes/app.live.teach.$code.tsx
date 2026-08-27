@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { createFileRoute, notFound, useNavigate } from "@tanstack/react-router";
-import { CheckCircle2, Mic, MicOff, Radio, Square } from "lucide-react";
+import { Camera, CameraOff, CheckCircle2, Mic, MicOff, MonitorUp, Radio, Square } from "lucide-react";
 import { toast } from "sonner";
 
 import { AppShell } from "@/components/layout/AppShell";
@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { liveLanguage } from "@/data/live-languages";
 import { useSpeechRecognition } from "@/hooks/useSpeechRecognition";
 import { liveService } from "@/lib/live.service";
+import { useLiveWebRTC } from "@/hooks/useLiveWebRTC";
 
 export const Route = createFileRoute("/app/live/teach/$code")({
   loader: async ({ params }) => {
@@ -26,8 +27,15 @@ function TeachClassPage() {
   const [saving, setSaving] = useState(false);
   const postingRef = useRef(Promise.resolve());
   const language = liveLanguage(liveClass.teacher_lang);
+  const media = useLiveWebRTC({ classId: liveClass.id, role: "teacher", active: isLive });
 
   const onFinal = (text: string) => {
+    if (import.meta.env.DEV) {
+      console.debug("[live-translation] speech segment detected", {
+        at: performance.now(),
+        characters: text.length,
+      });
+    }
     setMessages((current) => [...current, text]);
     postingRef.current = postingRef.current
       .then(() => liveService.postMessage(liveClass.id, text, liveClass.teacher_lang))
@@ -41,6 +49,10 @@ function TeachClassPage() {
   useEffect(() => {
     if (speech.error) toast.error(speech.error);
   }, [speech.error]);
+
+  useEffect(() => {
+    if (isLive) void media.startLocalMedia();
+  }, [isLive, media.startLocalMedia]);
 
   const startClass = async () => {
     setSaving(true);
@@ -56,6 +68,7 @@ function TeachClassPage() {
   };
 
   const endClass = async () => {
+    media.endClass();
     speech.stop();
     setSaving(true);
     try {
@@ -79,10 +92,19 @@ function TeachClassPage() {
               <h1 className="mt-1 text-2xl font-bold tracking-tight">{liveClass.name}</h1>
               <p className="mt-1 text-sm text-muted-foreground">{liveClass.subject} · {liveClass.grade} · Teaching in {language.label}</p>
             </div>
-            <span className="flex shrink-0 items-center gap-2 rounded-full bg-primary-soft px-3 py-1.5 text-xs font-semibold text-primary"><Radio className="size-3.5" /> {isLive ? "Live" : "Ready"}</span>
+            <span className="flex shrink-0 items-center gap-2 rounded-full bg-primary-soft px-3 py-1.5 text-xs font-semibold text-primary"><Radio className="size-3.5" /> {isLive ? media.status === "connected" ? "Connected" : media.status === "reconnecting" ? "Reconnecting..." : "Connecting..." : "Ready"}</span>
           </div>
           <section className="mt-8 rounded-2xl border border-border bg-card p-6 shadow-card">
-            <div className="flex flex-col items-center py-8 text-center">
+            <div className="overflow-hidden rounded-xl bg-slate-950">
+              <video ref={media.localVideoRef} autoPlay muted playsInline className="aspect-video w-full object-cover" />
+            </div>
+            <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
+              <Button variant="outline" className="rounded-xl" onClick={media.toggleMicrophone} disabled={!media.microphoneEnabled && !media.mediaError}><>{media.microphoneEnabled ? <Mic className="size-4" /> : <MicOff className="size-4" />} {media.microphoneEnabled ? "Mute" : "Unmute"}</></Button>
+              <Button variant="outline" className="rounded-xl" onClick={media.toggleCamera} disabled={!media.cameraEnabled && !media.mediaError}>{media.cameraEnabled ? <Camera className="size-4" /> : <CameraOff className="size-4" />} {media.cameraEnabled ? "Camera off" : "Camera on"}</Button>
+              <Button variant="outline" className="rounded-xl" onClick={() => void media.shareScreen()}><MonitorUp className="size-4" /> Share screen</Button>
+            </div>
+            {media.mediaError && <p className="mt-3 text-center text-sm text-muted-foreground">{media.mediaError}</p>}
+            <div className="mt-5 flex flex-col items-center py-4 text-center">
               <span className="grid size-20 place-items-center rounded-full bg-primary-soft text-primary">{speech.listening ? <Mic className="size-8" /> : <MicOff className="size-8" />}</span>
               <p className="mt-5 text-lg font-semibold">{speech.listening ? "Listening for your lesson" : "Microphone is off"}</p>
               <p className="mt-2 min-h-6 max-w-xl text-sm text-muted-foreground">{speech.interim || "Final sentences will appear here and be shared with students."}</p>

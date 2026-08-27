@@ -27,7 +27,9 @@ function serverEnvironment(): { SARVAM_API_KEY?: string } {
 export const translateText = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => TranslateInput.parse(input))
   .handler(async ({ data }) => {
-    if (data.from === data.to) return { text: data.text };
+    const sourceLanguageCode = sarvamLanguageCode(data.from);
+    const targetLanguageCode = sarvamLanguageCode(data.to);
+    if (sourceLanguageCode === targetLanguageCode) return { text: data.text };
 
     const apiKey = serverEnvironment().SARVAM_API_KEY?.trim();
     if (!apiKey) {
@@ -44,8 +46,8 @@ export const translateText = createServerFn({ method: "POST" })
         },
         body: JSON.stringify({
           input: data.text,
-          source_language_code: sarvamLanguageCode(data.from),
-          target_language_code: sarvamLanguageCode(data.to),
+          source_language_code: sourceLanguageCode,
+          target_language_code: targetLanguageCode,
           model: "sarvam-translate:v1",
         }),
       });
