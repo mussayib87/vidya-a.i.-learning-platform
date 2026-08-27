@@ -26,6 +26,8 @@ import { Route as OnboardingReviewRouteImport } from './routes/onboarding/review
 import { Route as OnboardingSubjectsRouteImport } from './routes/onboarding/subjects'
 import { Route as OnboardingWelcomeRouteImport } from './routes/onboarding/welcome'
 import { Route as AppLessonsLessonIdRouteImport } from './routes/app.lessons.$lessonId'
+import { Route as AppLiveCreateRouteImport } from './routes/app.live.create'
+import { Route as AppLiveJoinRouteImport } from './routes/app.live.join'
 import { Route as AppSubjectsIndexRouteImport } from './routes/app.subjects.index'
 import { Route as AppSubjectsSubjectIdRouteImport } from './routes/app.subjects.$subjectId'
 
@@ -114,6 +116,16 @@ const AppLessonsLessonIdRoute = AppLessonsLessonIdRouteImport.update({
   path: '/app/lessons/$lessonId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AppLiveCreateRoute = AppLiveCreateRouteImport.update({
+  id: '/app/live/create',
+  path: '/app/live/create',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AppLiveJoinRoute = AppLiveJoinRouteImport.update({
+  id: '/app/live/join',
+  path: '/app/live/join',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AppSubjectsIndexRoute = AppSubjectsIndexRouteImport.update({
   id: '/app/subjects/',
   path: '/app/subjects/',
@@ -143,6 +155,8 @@ export interface FileRoutesByFullPath {
   '/onboarding/subjects': typeof OnboardingSubjectsRoute
   '/onboarding/welcome': typeof OnboardingWelcomeRoute
   '/app/lessons/$lessonId': typeof AppLessonsLessonIdRoute
+  '/app/live/create': typeof AppLiveCreateRoute
+  '/app/live/join': typeof AppLiveJoinRoute
   '/app/subjects/$subjectId': typeof AppSubjectsSubjectIdRoute
   '/app/subjects/': typeof AppSubjectsIndexRoute
 }
@@ -164,6 +178,8 @@ export interface FileRoutesByTo {
   '/onboarding/subjects': typeof OnboardingSubjectsRoute
   '/onboarding/welcome': typeof OnboardingWelcomeRoute
   '/app/lessons/$lessonId': typeof AppLessonsLessonIdRoute
+  '/app/live/create': typeof AppLiveCreateRoute
+  '/app/live/join': typeof AppLiveJoinRoute
   '/app/subjects/$subjectId': typeof AppSubjectsSubjectIdRoute
   '/app/subjects': typeof AppSubjectsIndexRoute
 }
@@ -186,6 +202,8 @@ export interface FileRoutesById {
   '/onboarding/subjects': typeof OnboardingSubjectsRoute
   '/onboarding/welcome': typeof OnboardingWelcomeRoute
   '/app/lessons/$lessonId': typeof AppLessonsLessonIdRoute
+  '/app/live/create': typeof AppLiveCreateRoute
+  '/app/live/join': typeof AppLiveJoinRoute
   '/app/subjects/$subjectId': typeof AppSubjectsSubjectIdRoute
   '/app/subjects/': typeof AppSubjectsIndexRoute
 }
@@ -209,6 +227,8 @@ export interface FileRouteTypes {
     | '/onboarding/subjects'
     | '/onboarding/welcome'
     | '/app/lessons/$lessonId'
+    | '/app/live/create'
+    | '/app/live/join'
     | '/app/subjects/$subjectId'
     | '/app/subjects/'
   fileRoutesByTo: FileRoutesByTo
@@ -230,6 +250,8 @@ export interface FileRouteTypes {
     | '/onboarding/subjects'
     | '/onboarding/welcome'
     | '/app/lessons/$lessonId'
+    | '/app/live/create'
+    | '/app/live/join'
     | '/app/subjects/$subjectId'
     | '/app/subjects'
   id:
@@ -251,6 +273,8 @@ export interface FileRouteTypes {
     | '/onboarding/subjects'
     | '/onboarding/welcome'
     | '/app/lessons/$lessonId'
+    | '/app/live/create'
+    | '/app/live/join'
     | '/app/subjects/$subjectId'
     | '/app/subjects/'
   fileRoutesById: FileRoutesById
@@ -266,6 +290,8 @@ export interface RootRouteChildren {
   AppProgressRoute: typeof AppProgressRoute
   AppTutorRoute: typeof AppTutorRoute
   AppLessonsLessonIdRoute: typeof AppLessonsLessonIdRoute
+  AppLiveCreateRoute: typeof AppLiveCreateRoute
+  AppLiveJoinRoute: typeof AppLiveJoinRoute
   AppSubjectsSubjectIdRoute: typeof AppSubjectsSubjectIdRoute
   AppSubjectsIndexRoute: typeof AppSubjectsIndexRoute
 }
@@ -391,6 +417,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppLessonsLessonIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/app/live/create': {
+      id: '/app/live/create'
+      path: '/app/live/create'
+      fullPath: '/app/live/create'
+      preLoaderRoute: typeof AppLiveCreateRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/app/live/join': {
+      id: '/app/live/join'
+      path: '/app/live/join'
+      fullPath: '/app/live/join'
+      preLoaderRoute: typeof AppLiveJoinRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/app/subjects/': {
       id: '/app/subjects/'
       path: '/app/subjects'
@@ -443,6 +483,8 @@ const rootRouteChildren: RootRouteChildren = {
   AppProgressRoute: AppProgressRoute,
   AppTutorRoute: AppTutorRoute,
   AppLessonsLessonIdRoute: AppLessonsLessonIdRoute,
+  AppLiveCreateRoute: AppLiveCreateRoute,
+  AppLiveJoinRoute: AppLiveJoinRoute,
   AppSubjectsSubjectIdRoute: AppSubjectsSubjectIdRoute,
   AppSubjectsIndexRoute: AppSubjectsIndexRoute,
 }
