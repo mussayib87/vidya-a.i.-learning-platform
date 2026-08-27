@@ -1,5 +1,5 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { Flame, GraduationCap, Target, Timer } from "lucide-react";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { ArrowRight, Flame, GraduationCap, LogIn, Radio, Target, Timer } from "lucide-react";
 import { AppShell } from "@/components/layout/AppShell";
 import { StatCard } from "@/components/ui-kit/StatCard";
 import { ProgressBar } from "@/components/ui-kit/ProgressBar";
@@ -44,6 +44,21 @@ function DashboardPage() {
         <p className="mt-1 text-muted-foreground">
           Here's where you left off. Keep the streak alive.
         </p>
+
+        <section className="mt-6 grid gap-4 sm:grid-cols-2">
+          <Link to="/app/live/create" className="group rounded-2xl border border-primary/20 bg-primary-soft p-5 transition-colors hover:border-primary/40">
+            <Radio className="size-5 text-primary" />
+            <h2 className="mt-4 font-semibold">Create a live class</h2>
+            <p className="mt-1 text-sm text-muted-foreground">Teach students in their own language.</p>
+            <span className="mt-4 flex items-center gap-2 text-sm font-semibold text-primary">Start creating <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" /></span>
+          </Link>
+          <Link to="/app/live/join" className="group rounded-2xl border border-border bg-card p-5 shadow-card transition-colors hover:border-accent/40">
+            <LogIn className="size-5 text-accent" />
+            <h2 className="mt-4 font-semibold">Join a live class</h2>
+            <p className="mt-1 text-sm text-muted-foreground">Follow your teacher in your mother tongue.</p>
+            <span className="mt-4 flex items-center gap-2 text-sm font-semibold text-accent">Enter class code <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" /></span>
+          </Link>
+        </section>
 
         <div className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
           <StatCard

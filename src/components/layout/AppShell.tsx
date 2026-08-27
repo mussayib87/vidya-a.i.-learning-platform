@@ -7,6 +7,7 @@ import {
   LogOut,
   Menu,
   MessageSquareText,
+  Radio,
   UserRound,
   X,
 } from "lucide-react";
@@ -19,6 +20,7 @@ const nav = [
   { to: "/app/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { to: "/app/subjects", label: "Subjects", icon: BookOpen },
   { to: "/app/tutor", label: "AI Tutor", icon: MessageSquareText },
+  { to: "/app/live/join", label: "Live Class", icon: Radio },
   { to: "/app/progress", label: "Progress", icon: LineChart },
   { to: "/app/profile", label: "Profile", icon: UserRound },
 ] as const;
