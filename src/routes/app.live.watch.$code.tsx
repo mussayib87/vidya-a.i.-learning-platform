@@ -5,7 +5,7 @@ import { z } from "zod";
 import { toast } from "sonner";
 
 import { AppShell } from "@/components/layout/AppShell";
-import { Button as UiButton } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import { liveLanguages } from "@/data/live-languages";
 import { supabase } from "@/integrations/supabase/client";
 import { translateText } from "@/lib/translate.functions";
@@ -49,7 +49,7 @@ function ClassAccessError({ message, onBack }: { message: string; onBack: () => 
         <div className="mx-auto w-full max-w-lg rounded-2xl border border-border bg-card p-6 text-center shadow-card">
           <div className="flex items-center justify-center gap-2 text-destructive"><AlertCircle className="size-5" /><h1 className="font-semibold">Unable to join class</h1></div>
           <p className="mt-3 text-sm text-muted-foreground">{message}</p>
-          <UiButton variant="outline" className="mt-6 rounded-xl" onClick={onBack}>Return to join class</UiButton>
+          <Button variant="outline" className="mt-6 rounded-xl" onClick={onBack}>Return to join class</Button>
         </div>
       </main>
     </AppShell>
