@@ -54,11 +54,11 @@ function JoinClassPage() {
     try {
       const cls = await liveService.getByCode(normalized);
       if (!cls) {
-        toast.error("No class found with that code.");
+        toast.error("Class not found. Please check your joining code.");
         return;
       }
       if (!cls.is_live) {
-        toast.error("This class has not started or has already ended.");
+        toast.error("This class is not currently live.");
         return;
       }
       navigate({

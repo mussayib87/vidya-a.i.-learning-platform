@@ -28,6 +28,7 @@ import { Route as OnboardingWelcomeRouteImport } from './routes/onboarding/welco
 import { Route as AppLessonsLessonIdRouteImport } from './routes/app.lessons.$lessonId'
 import { Route as AppLiveCreateRouteImport } from './routes/app.live.create'
 import { Route as AppLiveJoinRouteImport } from './routes/app.live.join'
+import { Route as AppLiveWatchCodeRouteImport } from './routes/app.live.watch.$code'
 import { Route as AppSubjectsIndexRouteImport } from './routes/app.subjects.index'
 import { Route as AppSubjectsSubjectIdRouteImport } from './routes/app.subjects.$subjectId'
 
@@ -126,6 +127,11 @@ const AppLiveJoinRoute = AppLiveJoinRouteImport.update({
   path: '/app/live/join',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AppLiveWatchCodeRoute = AppLiveWatchCodeRouteImport.update({
+  id: '/app/live/watch/$code',
+  path: '/app/live/watch/$code',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AppSubjectsIndexRoute = AppSubjectsIndexRouteImport.update({
   id: '/app/subjects/',
   path: '/app/subjects/',
@@ -157,6 +163,7 @@ export interface FileRoutesByFullPath {
   '/app/lessons/$lessonId': typeof AppLessonsLessonIdRoute
   '/app/live/create': typeof AppLiveCreateRoute
   '/app/live/join': typeof AppLiveJoinRoute
+  '/app/live/watch/$code': typeof AppLiveWatchCodeRoute
   '/app/subjects/$subjectId': typeof AppSubjectsSubjectIdRoute
   '/app/subjects/': typeof AppSubjectsIndexRoute
 }
@@ -180,6 +187,7 @@ export interface FileRoutesByTo {
   '/app/lessons/$lessonId': typeof AppLessonsLessonIdRoute
   '/app/live/create': typeof AppLiveCreateRoute
   '/app/live/join': typeof AppLiveJoinRoute
+  '/app/live/watch/$code': typeof AppLiveWatchCodeRoute
   '/app/subjects/$subjectId': typeof AppSubjectsSubjectIdRoute
   '/app/subjects': typeof AppSubjectsIndexRoute
 }
@@ -204,6 +212,7 @@ export interface FileRoutesById {
   '/app/lessons/$lessonId': typeof AppLessonsLessonIdRoute
   '/app/live/create': typeof AppLiveCreateRoute
   '/app/live/join': typeof AppLiveJoinRoute
+  '/app/live/watch/$code': typeof AppLiveWatchCodeRoute
   '/app/subjects/$subjectId': typeof AppSubjectsSubjectIdRoute
   '/app/subjects/': typeof AppSubjectsIndexRoute
 }
@@ -292,6 +301,7 @@ export interface RootRouteChildren {
   AppLessonsLessonIdRoute: typeof AppLessonsLessonIdRoute
   AppLiveCreateRoute: typeof AppLiveCreateRoute
   AppLiveJoinRoute: typeof AppLiveJoinRoute
+  AppLiveWatchCodeRoute: typeof AppLiveWatchCodeRoute
   AppSubjectsSubjectIdRoute: typeof AppSubjectsSubjectIdRoute
   AppSubjectsIndexRoute: typeof AppSubjectsIndexRoute
 }
@@ -431,6 +441,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppLiveJoinRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/app/live/watch/$code': {
+      id: '/app/live/watch/$code'
+      path: '/app/live/watch/$code'
+      fullPath: '/app/live/watch/$code'
+      preLoaderRoute: typeof AppLiveWatchCodeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/app/subjects/': {
       id: '/app/subjects/'
       path: '/app/subjects'
@@ -485,6 +502,7 @@ const rootRouteChildren: RootRouteChildren = {
   AppLessonsLessonIdRoute: AppLessonsLessonIdRoute,
   AppLiveCreateRoute: AppLiveCreateRoute,
   AppLiveJoinRoute: AppLiveJoinRoute,
+  AppLiveWatchCodeRoute: AppLiveWatchCodeRoute,
   AppSubjectsSubjectIdRoute: AppSubjectsSubjectIdRoute,
   AppSubjectsIndexRoute: AppSubjectsIndexRoute,
 }
