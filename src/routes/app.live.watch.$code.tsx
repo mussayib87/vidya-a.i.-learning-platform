@@ -1,14 +1,15 @@
 import { useEffect, useRef, useState } from "react";
-import { createFileRoute, notFound, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { AlertCircle, Camera, Headphones, LogOut, MicOff, Radio, Volume2 } from "lucide-react";
 import { z } from "zod";
 import { toast } from "sonner";
 
 import { AppShell } from "@/components/layout/AppShell";
+import { Button as UiButton } from "@/components/ui/button";
 import { liveLanguages } from "@/data/live-languages";
 import { supabase } from "@/integrations/supabase/client";
 import { translateText } from "@/lib/translate.functions";
-import { liveService, type LiveMessage } from "@/lib/live.service";
+import { liveService, type LiveClass, type LiveMessage } from "@/lib/live.service";
 import { useLiveWebRTC } from "@/hooks/useLiveWebRTC";
 
 const searchSchema = z.object({ lang: z.string().optional() });
@@ -16,17 +17,46 @@ const searchSchema = z.object({ lang: z.string().optional() });
 export const Route = createFileRoute("/app/live/watch/$code")({
   validateSearch: searchSchema,
   loader: async ({ params }) => {
-    const liveClass = await liveService.getByCode(params.code);
-    if (!liveClass) throw notFound();
-    return { liveClass };
+    try {
+      const liveClass = await liveService.getByCode(params.code);
+      return { liveClass, lookupError: null };
+    } catch {
+      return { liveClass: null, lookupError: "Could not load this class. Please try again." };
+    }
   },
-  component: WatchClassPage,
+  component: StudentClassRoutePage,
 });
 
 type DisplayMessage = LiveMessage & { translated?: string; translating?: boolean; error?: string };
 
-function WatchClassPage() {
-  const { liveClass } = Route.useLoaderData();
+function StudentClassRoutePage() {
+  const { liveClass, lookupError } = Route.useLoaderData();
+  const navigate = useNavigate();
+
+  if (!liveClass) {
+    return <ClassAccessError message={lookupError ?? "Class not found. Please check your joining code."} onBack={() => void navigate({ to: "/app/live/join" })} />;
+  }
+  if (!liveClass.is_live) {
+    return <ClassAccessError message="This class is not currently live." onBack={() => void navigate({ to: "/app/live/join" })} />;
+  }
+  return <WatchClassPage liveClass={liveClass} />;
+}
+
+function ClassAccessError({ message, onBack }: { message: string; onBack: () => void }) {
+  return (
+    <AppShell>
+      <main className="px-4 py-8 sm:px-6 lg:px-8">
+        <div className="mx-auto w-full max-w-lg rounded-2xl border border-border bg-card p-6 text-center shadow-card">
+          <div className="flex items-center justify-center gap-2 text-destructive"><AlertCircle className="size-5" /><h1 className="font-semibold">Unable to join class</h1></div>
+          <p className="mt-3 text-sm text-muted-foreground">{message}</p>
+          <UiButton variant="outline" className="mt-6 rounded-xl" onClick={onBack}>Return to join class</UiButton>
+        </div>
+      </main>
+    </AppShell>
+  );
+}
+
+function WatchClassPage({ liveClass }: { liveClass: LiveClass }) {
   const { lang } = Route.useSearch();
   const navigate = useNavigate();
   const [messages, setMessages] = useState<DisplayMessage[]>([]);
