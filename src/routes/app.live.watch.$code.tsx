@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { AlertCircle, Camera, Headphones, LogOut, MicOff, Radio, Volume2 } from "lucide-react";
+import { AlertCircle, Camera, Headphones, LogOut, MicOff, Radio, Volume2, Volume } from "lucide-react";
 import { z } from "zod";
 import { toast } from "sonner";
 
@@ -140,11 +140,92 @@ function WatchClassPage({ liveClass }: { liveClass: LiveClass }) {
 
   return (
     <AppShell>
-      <main className="px-4 py-8 sm:px-6 lg:px-8"><div className="mx-auto w-full max-w-3xl">
-        <div className="flex items-start justify-between gap-4"><div><p className="text-sm text-muted-foreground">Live classroom · {liveClass.code}</p><h1 className="mt-1 text-2xl font-bold tracking-tight">{liveClass.name}</h1><p className="mt-1 text-sm text-muted-foreground">{liveClass.subject} · Hearing in {selected?.label ?? "unknown language"}</p></div><span className="flex shrink-0 items-center gap-2 rounded-full bg-primary-soft px-3 py-1.5 text-xs font-semibold text-primary"><Radio className="size-3.5" /> {status}</span></div>
-        {error && <div className="mt-6 flex gap-2 rounded-xl border border-destructive/30 bg-destructive/5 p-4 text-sm text-destructive"><AlertCircle className="size-4 shrink-0" /> {error}</div>}
-        <section className="mt-8 rounded-2xl border border-border bg-card p-5 shadow-card"><div className="overflow-hidden rounded-xl bg-slate-950"><video ref={media.remoteVideoRef} autoPlay playsInline className="aspect-video w-full object-cover" /></div><div className="mt-3 flex items-center justify-between text-sm"><span className="flex items-center gap-2 text-muted-foreground"><Headphones className="size-4" /> Teacher audio</span><span className="font-medium text-primary">{media.status === "connected" ? "Connected" : media.status === "reconnecting" ? "Reconnecting..." : "Connecting..."}</span></div><div className="mt-5 flex items-center gap-3"><span className="grid size-10 place-items-center rounded-xl bg-muted text-muted-foreground"><MicOff className="size-4" /></span><p className="text-sm text-muted-foreground">Student microphone is muted</p></div><div className="mt-5 flex items-center gap-3"><span className="grid size-10 place-items-center rounded-xl bg-muted text-muted-foreground"><Camera className="size-4" /></span><p className="text-sm text-muted-foreground">Teacher camera and audio are live</p></div><div className="mt-5 flex items-center gap-3"><span className="grid size-11 place-items-center rounded-2xl bg-accent/10 text-accent"><Headphones className="size-5" /></span><div><h2 className="font-semibold">Teacher transcript</h2><p className="text-sm text-muted-foreground">Translations are read aloud as they arrive.</p></div></div><div className="mt-5 space-y-4">{messages.length === 0 ? <p className="text-sm text-muted-foreground">Waiting for the teacher to speak...</p> : messages.map((message) => <article key={message.id} className="border-t border-border pt-4 first:border-t-0 first:pt-0"><p className="text-sm text-muted-foreground">{message.source_text}</p><p className="mt-1 flex items-start gap-2 text-base font-medium">{message.translated ?? (message.translating ? "Translating..." : message.error)}{message.translated && <Volume2 className="mt-0.5 size-4 shrink-0 text-primary" />}</p></article>)}</div><Button variant="outline" className="mt-6 rounded-xl" onClick={() => void navigate({ to: "/app/live/join" })}><LogOut className="size-4" /> Leave class</Button></section>
-      </div></main>
+      <main className="px-4 py-8 sm:px-6 lg:px-8">
+        <div className="mx-auto w-full max-w-3xl">
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <p className="text-sm text-muted-foreground">Live classroom · {liveClass.code}</p>
+              <h1 className="mt-1 text-2xl font-bold tracking-tight">{liveClass.name}</h1>
+              <p className="mt-1 text-sm text-muted-foreground">{liveClass.subject} · Hearing in {selected?.label ?? "unknown language"}</p>
+            </div>
+            <span className="flex shrink-0 items-center gap-2 rounded-full bg-primary-soft px-3 py-1.5 text-xs font-semibold text-primary">
+              <Radio className="size-3.5" /> {status}
+            </span>
+          </div>
+          {error && (
+            <div className="mt-6 flex gap-2 rounded-xl border border-destructive/30 bg-destructive/5 p-4 text-sm text-destructive">
+              <AlertCircle className="size-4 shrink-0" /> {error}
+            </div>
+          )}
+          <section className="mt-8 rounded-2xl border border-border bg-card p-5 shadow-card">
+            <div className="overflow-hidden rounded-xl bg-slate-950">
+              <video ref={media.remoteVideoRef} autoPlay playsInline className="aspect-video w-full object-cover" />
+            </div>
+            <div className="mt-3 flex items-center justify-between text-sm">
+              <span className="flex items-center gap-2 text-muted-foreground">
+                <Headphones className="size-4" /> Teacher audio
+              </span>
+              <span className="font-medium text-primary">
+                {media.status === "connected" ? "Connected" : media.status === "reconnecting" ? "Reconnecting..." : "Connecting..."}
+              </span>
+            </div>
+            {import.meta.env.DEV && (
+              <p className="mt-2 text-xs text-muted-foreground">
+                [DEBUG] Audio: {media.audioEnabled ? "✓ Enabled" : "✗ Disabled"} | Status: {media.status}
+              </p>
+            )}
+            
+            {!media.audioEnabled && (
+              <div className="mt-4 flex items-center justify-between rounded-lg bg-yellow-50 p-3">
+                <span className="text-sm text-yellow-800">Audio may be muted due to browser restrictions</span>
+                <Button size="sm" variant="default" onClick={() => media.enableAudio()} className="ml-2">
+                  <Volume className="size-4" /> Enable Audio
+                </Button>
+              </div>
+            )}
+            
+            <div className="mt-5 flex items-center gap-3">
+              <span className="grid size-10 place-items-center rounded-xl bg-muted text-muted-foreground">
+                <MicOff className="size-4" />
+              </span>
+              <p className="text-sm text-muted-foreground">Student microphone is muted</p>
+            </div>
+            <div className="mt-5 flex items-center gap-3">
+              <span className="grid size-10 place-items-center rounded-xl bg-muted text-muted-foreground">
+                <Camera className="size-4" />
+              </span>
+              <p className="text-sm text-muted-foreground">Teacher camera and audio are live</p>
+            </div>
+            <div className="mt-5 flex items-center gap-3">
+              <span className="grid size-11 place-items-center rounded-2xl bg-accent/10 text-accent">
+                <Headphones className="size-5" />
+              </span>
+              <div>
+                <h2 className="font-semibold">Teacher transcript</h2>
+                <p className="text-sm text-muted-foreground">Translations are read aloud as they arrive.</p>
+              </div>
+            </div>
+            <div className="mt-5 space-y-4">
+              {messages.length === 0 ? (
+                <p className="text-sm text-muted-foreground">Waiting for the teacher to speak...</p>
+              ) : (
+                messages.map((message) => (
+                  <article key={message.id} className="border-t border-border pt-4 first:border-t-0 first:pt-0">
+                    <p className="text-sm text-muted-foreground">{message.source_text}</p>
+                    <p className="mt-1 flex items-start gap-2 text-base font-medium">
+                      {message.translated ?? (message.translating ? "Translating..." : message.error)}
+                      {message.translated && <Volume2 className="mt-0.5 size-4" />}
+                    </p>
+                  </article>
+                ))
+              )}
+            </div>
+            <Button variant="outline" className="mt-6 rounded-xl" onClick={() => void navigate({ to: "/app/live/join" })}>
+              <LogOut className="size-4" /> Leave class
+            </Button>
+          </section>
+        </div>
+      </main>
     </AppShell>
   );
 }

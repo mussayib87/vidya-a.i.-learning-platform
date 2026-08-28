@@ -33,6 +33,7 @@ export function useLiveWebRTC({ classId, role, active = true }: UseLiveWebRTCOpt
   const [classEnded, setClassEnded] = useState(false);
   const [cameraEnabled, setCameraEnabled] = useState(false);
   const [microphoneEnabled, setMicrophoneEnabled] = useState(false);
+  const [audioEnabled, setAudioEnabled] = useState(true);
   const localVideoRef = useRef<HTMLVideoElement>(null);
   const remoteVideoRef = useRef<HTMLVideoElement>(null);
   const channelRef = useRef<ReturnType<typeof supabase.channel> | null>(null);
@@ -60,8 +61,28 @@ export function useLiveWebRTC({ classId, role, active = true }: UseLiveWebRTCOpt
     const stream = localStreamRef.current;
     if (!stream) return;
     const existingKinds = new Set(connection.getSenders().map((sender) => sender.track?.kind));
+    const videoTracks = stream.getVideoTracks();
+    const audioTracks = stream.getAudioTracks();
+    
+    if (import.meta.env.DEV) {
+      console.log("[WebRTC-Debug] Teacher stream tracks:", {
+        videoTracks: videoTracks.length,
+        audioTracks: audioTracks.length,
+        videoEnabled: videoTracks[0]?.enabled,
+        audioEnabled: audioTracks[0]?.enabled,
+      });
+    }
+    
     stream.getTracks().forEach((track) => {
-      if (!existingKinds.has(track.kind)) connection.addTrack(track, stream);
+      if (!existingKinds.has(track.kind)) {
+        connection.addTrack(track, stream);
+        if (import.meta.env.DEV) {
+          console.log("[WebRTC-Debug] Added track to peer connection:", {
+            kind: track.kind,
+            enabled: track.enabled,
+          });
+        }
+      }
     });
   }, []);
 
@@ -94,14 +115,31 @@ export function useLiveWebRTC({ classId, role, active = true }: UseLiveWebRTCOpt
       localStreamRef.current = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
       setCameraEnabled(true);
       setMicrophoneEnabled(true);
+      
+      if (import.meta.env.DEV) {
+        const videoTracks = localStreamRef.current.getVideoTracks();
+        const audioTracks = localStreamRef.current.getAudioTracks();
+        console.log("[WebRTC-Debug] Teacher media acquired:", {
+          videoTracks: videoTracks.length,
+          audioTracks: audioTracks.length,
+          videoEnabled: videoTracks[0]?.enabled,
+          audioEnabled: audioTracks[0]?.enabled,
+        });
+      }
     } catch {
       try {
         localStreamRef.current = await navigator.mediaDevices.getUserMedia({ audio: true });
         setCameraEnabled(false);
         setMicrophoneEnabled(true);
         setMediaError("Camera access was denied. The class is continuing with audio only.");
+        if (import.meta.env.DEV) {
+          console.log("[WebRTC-Debug] Teacher media acquired (audio only)");
+        }
       } catch {
         setMediaError("Camera and microphone access was denied. Check browser permissions.");
+        if (import.meta.env.DEV) {
+          console.error("[WebRTC-Debug] Failed to acquire teacher media");
+        }
       }
     }
     if (localVideoRef.current) {
@@ -161,6 +199,24 @@ export function useLiveWebRTC({ classId, role, active = true }: UseLiveWebRTCOpt
     if (channel && role === "teacher") sendSignal(channel, "class-ended", { from: peerIdRef.current });
   }, [role]);
 
+  const enableAudio = useCallback(() => {
+    if (remoteVideoRef.current && role === "student") {
+      remoteVideoRef.current.muted = false;
+      if (remoteVideoRef.current.volume !== null) {
+        remoteVideoRef.current.volume = 1;
+      }
+      void remoteVideoRef.current.play().catch((error) => {
+        if (import.meta.env.DEV) {
+          console.error("[WebRTC-Debug] Failed to enable audio playback:", error);
+        }
+      });
+      setAudioEnabled(true);
+      if (import.meta.env.DEV) {
+        console.log("[WebRTC-Debug] Audio enabled for student");
+      }
+    }
+  }, [role]);
+
   useEffect(() => {
     if (!active) return;
     mountedRef.current = true;
@@ -180,9 +236,29 @@ export function useLiveWebRTC({ classId, role, active = true }: UseLiveWebRTCOpt
           peerConnectionsRef.current.set(payload.from, connection);
           connection.ontrack = (trackEvent) => {
             const [stream] = trackEvent.streams;
+            if (import.meta.env.DEV) {
+              const videoTracks = stream?.getVideoTracks() ?? [];
+              const audioTracks = stream?.getAudioTracks() ?? [];
+              console.log("[WebRTC-Debug] Student received remote tracks:", {
+                videoTracks: videoTracks.length,
+                audioTracks: audioTracks.length,
+                videoEnabled: videoTracks[0]?.enabled,
+                audioEnabled: audioTracks[0]?.enabled,
+                trackKind: trackEvent.track.kind,
+              });
+            }
             if (stream && remoteVideoRef.current) {
               remoteVideoRef.current.srcObject = stream;
-              void remoteVideoRef.current.play().catch(() => undefined);
+              // Ensure remote video is NOT muted and audio can play
+              remoteVideoRef.current.muted = false;
+              if (remoteVideoRef.current.volume !== null) {
+                remoteVideoRef.current.volume = 1;
+              }
+              void remoteVideoRef.current.play().catch((error) => {
+                if (import.meta.env.DEV) {
+                  console.warn("[WebRTC-Debug] Remote video autoplay blocked (likely browser autoplay policy):", error);
+                }
+              });
             }
           };
           connection.onicecandidate = (iceEvent) => {
@@ -261,12 +337,14 @@ export function useLiveWebRTC({ classId, role, active = true }: UseLiveWebRTCOpt
     classEnded,
     cameraEnabled,
     microphoneEnabled,
+    audioEnabled,
     localVideoRef,
     remoteVideoRef,
     startLocalMedia,
     toggleMicrophone,
     toggleCamera,
     shareScreen,
+    enableAudio,
     endClass,
   };
 }

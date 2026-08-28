@@ -104,6 +104,11 @@ function TeachClassPage() {
               <Button variant="outline" className="rounded-xl" onClick={() => void media.shareScreen()}><MonitorUp className="size-4" /> Share screen</Button>
             </div>
             {media.mediaError && <p className="mt-3 text-center text-sm text-muted-foreground">{media.mediaError}</p>}
+            {import.meta.env.DEV && (
+              <p className="mt-2 text-center text-xs text-muted-foreground">
+                [DEBUG] Audio: {media.microphoneEnabled ? "✓ Enabled" : "✗ Muted"} | Status: {media.status}
+              </p>
+            )}
             <div className="mt-5 flex flex-col items-center py-4 text-center">
               <span className="grid size-20 place-items-center rounded-full bg-primary-soft text-primary">{speech.listening ? <Mic className="size-8" /> : <MicOff className="size-8" />}</span>
               <p className="mt-5 text-lg font-semibold">{speech.listening ? "Listening for your lesson" : "Microphone is off"}</p>
